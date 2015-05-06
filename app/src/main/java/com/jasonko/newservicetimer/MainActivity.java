@@ -11,35 +11,30 @@ import android.widget.Button;
 
 public class MainActivity extends Activity {
 
-    private Button btnStart;
-    private Button btnStop;
+    private static Button btnSwitch;
+    private UIHandler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        btnStart = (Button) findViewById(R.id.button_start);
-        btnStop = (Button) findViewById(R.id.button_stop);
+        btnSwitch = (Button) findViewById(R.id.button_switch);
 
-        btnStart.setOnClickListener(new View.OnClickListener() {
+        btnSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (TimerService.isTimerServiceRunning()){
-
+                    TimerService.setTimerStop();
+                    btnSwitch.setText("開始");
                 }else {
                     TimerService.setTimerRun();
                     Intent newIntent = new Intent(MainActivity.this, TimerService.class);
                     startService(newIntent);
+                    btnSwitch.setText("停止");
                 }
             }
         });
 
-        btnStop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TimerService.setTimerStop();
-            }
-        });
 
     }
 
@@ -63,5 +58,16 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void setSwichButtonState(){
+        btnSwitch.setText("開始");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        handler = new UIHandler(MainActivity.this);
+        TimerService.registerHandler(handler);
     }
 }

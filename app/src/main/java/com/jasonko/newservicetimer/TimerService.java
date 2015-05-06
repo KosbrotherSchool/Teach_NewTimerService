@@ -2,6 +2,7 @@ package com.jasonko.newservicetimer;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.os.Message;
 import android.util.Log;
 
 /**
@@ -10,6 +11,8 @@ import android.util.Log;
 public class TimerService extends IntentService {
 
     static boolean isRun = false;
+    int remainingTime = 10;
+    static UIHandler handler;
 
     public TimerService(){
         super("TimerService");
@@ -20,6 +23,8 @@ public class TimerService extends IntentService {
 
         while ( isRun ){
 
+            Log.i("TimerService", "Still runnging");
+
             try{
             // sleep 1 sec
                 Thread.sleep(1000);
@@ -27,10 +32,16 @@ public class TimerService extends IntentService {
 
             }
 
-            Log.i("TimerService", "Still runnging");
-
+            remainingTime = remainingTime -1;
+            if (remainingTime == 0){
+                break;
+            }
 
         }
+
+        Message msg = handler.obtainMessage();
+        msg.getData().putString(UIHandler.MSG, "stop");
+        handler.sendMessage(msg);
 
     }
 
@@ -44,6 +55,10 @@ public class TimerService extends IntentService {
 
     public static boolean isTimerServiceRunning(){
         return isRun;
+    }
+
+    public static void registerHandler(UIHandler activityHandler){
+        handler = activityHandler;
     }
 
 }
